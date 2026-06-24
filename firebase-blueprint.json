@@ -1,0 +1,205 @@
+{
+  "entities": {
+    "settings": {
+      "title": "Settings",
+      "description": "Global website configurations and settings.",
+      "type": "object",
+      "properties": {
+        "companyName": { "type": "string" },
+        "companyNameEn": { "type": "string" },
+        "tagline": { "type": "string" },
+        "taglineEn": { "type": "string" },
+        "whatsappNumber": { "type": "string" },
+        "messengerLink": { "type": "string" },
+        "contactPhone": { "type": "string" },
+        "contactEmail": { "type": "string" },
+        "officeAddress": { "type": "string" },
+        "officeAddressEn": { "type": "string" },
+        "workingHours": { "type": "string" },
+        "workingHoursEn": { "type": "string" },
+        "primaryColor": { "type": "string" },
+        "secondaryColor": { "type": "string" },
+        "googleMapsEmbedUrl": { "type": "string" },
+        "facebookPixel": { "type": "string" },
+        "googleAnalyticsId": { "type": "string" },
+        "seoTitle": { "type": "string" },
+        "seoDescription": { "type": "string" }
+      },
+      "required": ["companyName", "tagline", "whatsappNumber"]
+    },
+    "services": {
+      "title": "Service",
+      "description": "Engineering and architectural services offered.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "titleEn": { "type": "string" },
+        "description": { "type": "string" },
+        "descriptionEn": { "type": "string" },
+        "benefits": { "type": "array" },
+        "benefitsEn": { "type": "array" },
+        "iconName": { "type": "string" },
+        "imageUrl": { "type": "string" }
+      },
+      "required": ["title", "description", "iconName"]
+    },
+    "projects": {
+      "title": "Project",
+      "description": "Architectural and construction projects.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "titleEn": { "type": "string" },
+        "category": { "type": "string" },
+        "categoryEn": { "type": "string" },
+        "description": { "type": "string" },
+        "descriptionEn": { "type": "string" },
+        "images": { "type": "array" },
+        "area": { "type": "string" },
+        "budget": { "type": "string" },
+        "completionDate": { "type": "string" },
+        "clientName": { "type": "string" },
+        "location": { "type": "string" },
+        "locationEn": { "type": "string" },
+        "beforeImageUrl": { "type": "string" },
+        "afterImageUrl": { "type": "string" }
+      },
+      "required": ["title", "category", "description"]
+    },
+    "gallery": {
+      "title": "GalleryItem",
+      "description": "Gallery photos of construction progress.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "title": { "type": "string" },
+        "titleEn": { "type": "string" },
+        "category": { "type": "string" }
+      },
+      "required": ["imageUrl", "title"]
+    },
+    "testimonials": {
+      "title": "Testimonial",
+      "description": "Reviews from happy clients.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "nameEn": { "type": "string" },
+        "designation": { "type": "string" },
+        "designationEn": { "type": "string" },
+        "review": { "type": "string" },
+        "reviewEn": { "type": "string" },
+        "rating": { "type": "number" },
+        "photoUrl": { "type": "string" }
+      },
+      "required": ["name", "review", "rating"]
+    },
+    "blogs": {
+      "title": "Blog",
+      "description": "News, engineering tips and articles.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "titleEn": { "type": "string" },
+        "category": { "type": "string" },
+        "categoryEn": { "type": "string" },
+        "content": { "type": "string" },
+        "contentEn": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "author": { "type": "string" },
+        "authorEn": { "type": "string" },
+        "date": { "type": "string" },
+        "tags": { "type": "array" }
+      },
+      "required": ["title", "content", "category"]
+    },
+    "faqs": {
+      "title": "FAQ",
+      "description": "Frequently Asked Questions.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "question": { "type": "string" },
+        "questionEn": { "type": "string" },
+        "answer": { "type": "string" },
+        "answerEn": { "type": "string" }
+      },
+      "required": ["question", "answer"]
+    },
+    "team": {
+      "title": "TeamMember",
+      "description": "Expert engineers and team members.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "nameEn": { "type": "string" },
+        "designation": { "type": "string" },
+        "designationEn": { "type": "string" },
+        "photoUrl": { "type": "string" },
+        "socialFacebook": { "type": "string" },
+        "socialLinkedin": { "type": "string" }
+      },
+      "required": ["name", "designation"]
+    },
+    "messages": {
+      "title": "Message",
+      "description": "Contact form submissions.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "subject": { "type": "string" },
+        "message": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["name", "phone", "message", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/settings/config": {
+      "schema": "settings",
+      "description": "Global website configs document"
+    },
+    "/services/{serviceId}": {
+      "schema": "services",
+      "description": "Engineering services offered"
+    },
+    "/projects/{projectId}": {
+      "schema": "projects",
+      "description": "Completed or ongoing construction projects"
+    },
+    "/gallery/{galleryId}": {
+      "schema": "gallery",
+      "description": "Progress gallery items"
+    },
+    "/testimonials/{testimonialId}": {
+      "schema": "testimonials",
+      "description": "Client reviews"
+    },
+    "/blogs/{blogId}": {
+      "schema": "blogs",
+      "description": "Engineering blogs"
+    },
+    "/faqs/{faqId}": {
+      "schema": "faqs",
+      "description": "FAQs"
+    },
+    "/team/{memberId}": {
+      "schema": "team",
+      "description": "Team members"
+    },
+    "/messages/{messageId}": {
+      "schema": "messages",
+      "description": "Contact message logs"
+    }
+  }
+}
