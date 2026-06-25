@@ -73,6 +73,11 @@ export const Footer: React.FC = () => {
               <li>
                 <a href="#faq" className="hover:text-[#e6b325] transition-colors">{lang === 'bn' ? 'জিজ্ঞাসাসমূহ' : 'FAQs'}</a>
               </li>
+              <li>
+                <a href="#admin" className="text-[#e6b325]/70 hover:text-[#e6b325] hover:underline transition-all font-semibold font-sans">
+                  {lang === 'bn' ? 'অ্যাডমিন প্যানেল 🔑' : 'Admin Panel 🔑'}
+                </a>
+              </li>
             </ul>
           </div>
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../AppContext';
-import { Search, Globe, ShieldAlert, LogOut, Menu, X, LayoutDashboard } from 'lucide-react';
+import { Search, Globe, ShieldAlert, LogOut, Menu, X, Settings } from 'lucide-react';
 import { loginWithGoogle, logoutUser } from '../firebase';
 
 interface HeaderProps {
@@ -120,6 +120,15 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin }) => {
               <span>{lang === 'bn' ? 'English' : 'বাংলা'}</span>
             </button>
 
+            {/* Admin Dashboard trigger */}
+            <button
+              onClick={onOpenAdmin}
+              className="p-2 rounded-full border border-[#0d5c46] text-[#e6b325] hover:bg-[#0d5c46]/20 hover:border-[#e6b325]/30 hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center justify-center"
+              title={lang === 'bn' ? 'অ্যাডমিন প্যানেল' : 'Admin Panel'}
+            >
+              <Settings className="w-4 h-4 hover:rotate-45 transition-transform duration-300" />
+            </button>
+
             {/* Consultation CTA */}
             <button
               onClick={handleConsultationClick}
@@ -178,7 +187,17 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAdmin }) => {
             ))}
           </div>
 
-          <div className="flex items-center justify-end pt-2">
+          <div className="flex items-center justify-between pt-2">
+            <button
+              onClick={() => {
+                onOpenAdmin();
+                setMobileMenuOpen(false);
+              }}
+              className="flex items-center space-x-1.5 px-3 py-2 rounded-full border border-[#0d5c46] text-xs text-[#e6b325] hover:bg-[#0d5c46]/20 transition-all font-sans cursor-pointer"
+            >
+              <Settings className="w-3.5 h-3.5" />
+              <span>{lang === 'bn' ? 'অ্যাডমিন প্যানেল' : 'Admin Panel'}</span>
+            </button>
             <button
               onClick={handleConsultationClick}
               className="bg-[#0d5c46] text-white border border-[#e6b325] px-4 py-2 rounded-full font-sans font-semibold text-xs"

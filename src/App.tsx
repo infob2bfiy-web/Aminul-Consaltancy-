@@ -51,6 +51,23 @@ function MainAppContent() {
     };
   }, []);
 
+  const handleCloseAdmin = () => {
+    setShowAdmin(false);
+    // Clear the hash, query, or path to avoid immediately re-triggering the 1s auto-detect timer
+    if (window.location.hash.toLowerCase() === '#admin') {
+      window.location.hash = '';
+    }
+    if (window.location.search.toLowerCase().includes('admin')) {
+      const searchParams = new URLSearchParams(window.location.search);
+      searchParams.delete('admin');
+      const newSearch = searchParams.toString();
+      window.history.pushState(null, '', window.location.pathname + (newSearch ? '?' + newSearch : ''));
+    }
+    if (window.location.pathname.toLowerCase() === '/admin' || window.location.pathname.toLowerCase() === '/admin/') {
+      window.history.pushState(null, '', '/');
+    }
+  };
+
   if (loading) {
     return (
       <div className="fixed inset-0 bg-[#041a14] flex flex-col items-center justify-center space-y-4">
@@ -117,7 +134,7 @@ function MainAppContent() {
 
       {/* Admin Panel control screen */}
       {showAdmin && (
-        <AdminPanel onClose={() => setShowAdmin(false)} />
+        <AdminPanel onClose={handleCloseAdmin} />
       )}
 
     </div>

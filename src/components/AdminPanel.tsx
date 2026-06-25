@@ -321,9 +321,22 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onClose }) => {
               <Database className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-display font-extrabold text-base sm:text-lg text-white">
-                {lang === 'bn' ? 'আমিনুল ইঞ্জিনিয়ার্স - অ্যাডমিন কন্ট্রোল প্যানেল' : 'ACE - Admin Control Panel'}
-              </h3>
+              <div className="flex items-center space-x-2">
+                <h3 className="font-display font-extrabold text-base sm:text-lg text-white">
+                  {lang === 'bn' ? 'আমিনুল ইঞ্জিনিয়ার্স - অ্যাডমিন কন্ট্রোল প্যানেল' : 'ACE - Admin Control Panel'}
+                </h3>
+                {isSupabaseConfigured ? (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#10b981] mr-1 animate-pulse"></span>
+                    Supabase
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold bg-[#3b82f6]/20 text-[#3b82f6] border border-[#3b82f6]/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#3b82f6] mr-1"></span>
+                    Firebase
+                  </span>
+                )}
+              </div>
               <p className="text-[10px] sm:text-xs text-[#e6b325] font-sans font-medium">
                 {lang === 'bn' ? '১০০% ডাইনামিক রিয়েল-টাইম কনটেন্ট ম্যানেজমেন্ট সিস্টেম' : 'Real-time corporate engine. Fully editable.'}
               </p>
