@@ -1,112 +1,98 @@
-export interface Settings {
-  companyName: string;
-  companyNameEn: string;
+export interface CompanySettings {
+  name: string;
   tagline: string;
-  taglineEn: string;
-  whatsappNumber: string;
-  messengerLink: string;
-  contactPhone: string;
-  contactEmail: string;
-  officeAddress: string;
-  officeAddressEn: string;
-  workingHours: string;
-  workingHoursEn: string;
-  primaryColor: string;
-  secondaryColor: string;
-  googleMapsEmbedUrl: string;
-  facebookPixel: string;
-  googleAnalyticsId: string;
-  seoTitle: string;
-  seoDescription: string;
   logoUrl?: string;
   faviconUrl?: string;
-  adminUsername?: string;
-  adminPassword?: string;
+  primaryColor: string;
+  secondaryColor: string;
+  phone: string;
+  whatsapp: string;
+  messenger: string;
+  email: string;
+  address: string;
+  workingHours: string;
+  googleMapUrl: string;
+  facebookUrl?: string;
+  linkedinUrl?: string;
+  youtubeUrl?: string;
+  newsletterCount: number;
 }
 
-export interface Service {
+export interface ServiceItem {
   id: string;
-  title: string;
+  titleBn: string;
   titleEn: string;
-  description: string;
-  descriptionEn: string;
-  benefits: string[];
-  benefitsEn: string[];
+  descBn: string;
+  descEn: string;
   iconName: string;
-  imageUrl: string;
+  image: string;
+  benefitsBn: string[];
+  benefitsEn: string[];
+  category?: string;
+  badgeBn?: string;
+  badgeEn?: string;
 }
 
-export interface Project {
+export interface ProjectItem {
   id: string;
-  title: string;
+  titleBn: string;
   titleEn: string;
-  category: string;
-  categoryEn: string;
-  description: string;
-  descriptionEn: string;
-  images: string[];
-  area: string;
-  budget: string;
+  category: "residential" | "commercial" | "duplex" | "interior" | "apartment";
+  image: string;
+  additionalImages?: string[];
+  areaSft: number;
+  budgetLakh: number;
   completionDate: string;
-  clientName: string;
-  location: string;
+  clientNameBn: string;
+  clientNameEn: string;
+  locationBn: string;
   locationEn: string;
-  beforeImageUrl: string;
-  afterImageUrl: string;
+  descBn: string;
+  descEn: string;
+  beforeImage?: string;
+  afterImage?: string;
 }
 
-export interface GalleryItem {
+export interface TestimonialItem {
   id: string;
-  imageUrl: string;
-  title: string;
-  titleEn: string;
-  category: string;
-}
-
-export interface Testimonial {
-  id: string;
-  name: string;
+  nameBn: string;
   nameEn: string;
-  designation: string;
+  designationBn: string;
   designationEn: string;
-  review: string;
+  reviewBn: string;
   reviewEn: string;
   rating: number;
-  photoUrl: string;
+  image: string;
 }
 
-export interface Blog {
+export interface BlogItem {
   id: string;
-  title: string;
+  titleBn: string;
   titleEn: string;
-  category: string;
-  categoryEn: string;
-  content: string;
+  contentBn: string;
   contentEn: string;
-  imageUrl: string;
-  author: string;
-  authorEn: string;
+  category: "architecture" | "construction" | "engineering" | "tips";
+  image: string;
   date: string;
-  tags: string[];
+  authorBn: string;
+  authorEn: string;
 }
 
-export interface FAQ {
+export interface FaqItem {
   id: string;
-  question: string;
+  questionBn: string;
   questionEn: string;
-  answer: string;
+  answerBn: string;
   answerEn: string;
 }
 
 export interface TeamMember {
   id: string;
-  name: string;
+  nameBn: string;
   nameEn: string;
-  designation: string;
-  designationEn: string;
-  photoUrl: string;
-  socialFacebook?: string;
-  socialLinkedin?: string;
+  roleBn: string;
+  roleEn: string;
+  image: string;
 }
 
 export interface ContactMessage {
@@ -116,6 +102,29 @@ export interface ContactMessage {
   email: string;
   subject: string;
   message: string;
-  status: 'unread' | 'read';
-  createdAt: string;
+  date: string;
+  status: "unread" | "read";
+}
+
+export interface Statistics {
+  projectsBn: string;
+  projectsEn: string;
+  clientsBn: string;
+  clientsEn: string;
+  engineersBn: string;
+  engineersEn: string;
+  experienceBn: string;
+  experienceEn: string;
+}
+
+export interface AppData {
+  settings: CompanySettings;
+  services: ServiceItem[];
+  projects: ProjectItem[];
+  testimonials: TestimonialItem[];
+  blogs: BlogItem[];
+  faqs: FaqItem[];
+  team: TeamMember[];
+  stats: Statistics;
+  messages: ContactMessage[];
 }
