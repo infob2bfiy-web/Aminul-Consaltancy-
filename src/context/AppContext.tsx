@@ -24,6 +24,7 @@ interface AppContextProps {
   // Custom interactive setters
   updateSettings: (settings: Partial<CompanySettings>) => void;
   updateStats: (stats: Partial<Statistics>) => void;
+  updateSettingsAndStats: (settings: Partial<CompanySettings>, stats: Partial<Statistics>) => void;
   
   // Manage services
   addService: (srv: Omit<ServiceItem, "id">) => void;
@@ -96,13 +97,13 @@ function sanitizeAppData(loaded: any): AppData {
     ...loaded,
     settings: loaded.settings ? { ...initialAppData.settings, ...loaded.settings } : initialAppData.settings,
     stats: loaded.stats ? { ...initialAppData.stats, ...loaded.stats } : initialAppData.stats,
-    services: sanitizeList(loaded.services || [], "srv"),
-    projects: sanitizeList(loaded.projects || [], "proj"),
-    testimonials: sanitizeList(loaded.testimonials || [], "test"),
-    blogs: sanitizeList(loaded.blogs || [], "blog"),
-    faqs: sanitizeList(loaded.faqs || [], "faq"),
-    team: sanitizeList(loaded.team || [], "team"),
-    messages: sanitizeList(loaded.messages || [], "msg"),
+    services: sanitizeList(loaded.services || initialAppData.services, "srv"),
+    projects: sanitizeList(loaded.projects || initialAppData.projects, "proj"),
+    testimonials: sanitizeList(loaded.testimonials || initialAppData.testimonials, "test"),
+    blogs: sanitizeList(loaded.blogs || initialAppData.blogs, "blog"),
+    faqs: sanitizeList(loaded.faqs || initialAppData.faqs, "faq"),
+    team: sanitizeList(loaded.team || initialAppData.team, "team"),
+    messages: sanitizeList(loaded.messages || initialAppData.messages, "msg"),
   };
 }
 
@@ -335,6 +336,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const updateStats = (stats: Partial<Statistics>) => {
     const updated = {
       ...data,
+      stats: { ...data.stats, ...stats }
+    };
+    saveToLocal(updated);
+  };
+
+  const updateSettingsAndStats = (settings: Partial<CompanySettings>, stats: Partial<Statistics>) => {
+    const updated = {
+      ...data,
+      settings: { ...data.settings, ...settings },
       stats: { ...data.stats, ...stats }
     };
     saveToLocal(updated);
@@ -584,6 +594,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         syncWithSupabase,
         updateSettings,
         updateStats,
+        updateSettingsAndStats,
         addService,
         updateService,
         deleteService,

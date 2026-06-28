@@ -11,7 +11,7 @@ import { ImageUploader } from "./ImageUploader";
 export const AdminDashboard: React.FC = () => {
   const {
     data, isAdmin, loginAdmin, logoutAdmin, adminEmail, updateAdminCredentials,
-    twoFactorSetup, toggleTwoFactor, updateSettings, updateStats,
+    twoFactorSetup, toggleTwoFactor, updateSettings, updateStats, updateSettingsAndStats,
     addService, updateService, deleteService,
     addProject, updateProject, deleteProject,
     addTestimonial, updateTestimonial, deleteTestimonial,
@@ -92,8 +92,6 @@ export const AdminDashboard: React.FC = () => {
       linkedinUrl: formData.get("linkedinUrl") as string,
       youtubeUrl: formData.get("youtubeUrl") as string,
     };
-    updateSettings(updatedSettings);
-
     const updatedStats = {
       projectsBn: formData.get("projectsBn") as string,
       projectsEn: formData.get("projectsEn") as string,
@@ -104,7 +102,7 @@ export const AdminDashboard: React.FC = () => {
       experienceBn: formData.get("experienceBn") as string,
       experienceEn: formData.get("experienceEn") as string,
     };
-    updateStats(updatedStats);
+    updateSettingsAndStats(updatedSettings, updatedStats);
 
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 3000);
@@ -651,7 +649,11 @@ export const AdminDashboard: React.FC = () => {
 
 ALTER TABLE site_data ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they already exist to prevent duplicate policy errors
+DROP POLICY IF EXISTS "Allow public read access" ON site_data;
 CREATE POLICY "Allow public read access" ON site_data FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Allow public update access" ON site_data;
 CREATE POLICY "Allow public update access" ON site_data FOR ALL USING (true) WITH CHECK (true);`);
                               setSqlCopied(true);
                               setTimeout(() => setSqlCopied(false), 3000);
