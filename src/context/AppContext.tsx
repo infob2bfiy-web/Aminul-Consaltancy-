@@ -82,14 +82,16 @@ function sanitizeAppData(loaded: any): AppData {
   const sanitizeList = <T extends { id: string }>(list: T[], prefix: string): T[] => {
     if (!Array.isArray(list)) return [];
     const seen = new Set<string>();
-    return list.map((item, idx) => {
-      let id = item?.id;
-      if (!id || typeof id !== "string" || seen.has(id)) {
-        id = `${prefix}_${Date.now()}_${idx}_${Math.random().toString(36).substring(2, 9)}`;
-      }
-      seen.add(id);
-      return { ...item, id };
-    });
+    return list
+      .filter((item) => item && typeof item === "object")
+      .map((item, idx) => {
+        let id = item.id;
+        if (!id || typeof id !== "string" || seen.has(id)) {
+          id = `${prefix}_${Date.now()}_${idx}_${Math.random().toString(36).substring(2, 9)}`;
+        }
+        seen.add(id);
+        return { ...item, id };
+      });
   };
 
   return {
@@ -108,7 +110,7 @@ function sanitizeAppData(loaded: any): AppData {
 }
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [data, setData] = useState<AppData>(initialAppData);
+  const [data, setData] = useState<AppData>(() => sanitizeAppData(initialAppData));
   const [lang, setLang] = useState<"bn" | "en">("bn");
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [adminEmail, setAdminEmail] = useState<string>("admin");

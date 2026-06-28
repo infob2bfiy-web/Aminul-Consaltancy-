@@ -164,9 +164,13 @@ export const ProjectsSection: React.FC = () => {
         {/* Portfolio Detail & Before/After Lightbox Modal */}
         <AnimatePresence>
           {selectedProject && (
-            <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
+            <motion.div
+              key="project-modal-container"
+              className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4"
+            >
               {/* Backing tint */}
               <motion.div
+                key="project-backdrop"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -176,6 +180,7 @@ export const ProjectsSection: React.FC = () => {
 
               {/* Modal Box */}
               <motion.div
+                key="project-modal-content"
                 initial={{ opacity: 0, scale: 0.95, y: 30 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 30 }}
@@ -380,7 +385,7 @@ export const ProjectsSection: React.FC = () => {
                 </div>
 
               </motion.div>
-            </div>
+            </motion.div>
           )}
         </AnimatePresence>
 

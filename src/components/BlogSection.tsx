@@ -98,8 +98,12 @@ export const BlogSection: React.FC = () => {
         {/* Read Article Modal Lightbox */}
         <AnimatePresence>
           {selectedBlog && (
-            <div className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4">
+            <motion.div
+              key="blog-modal-container"
+              className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-4"
+            >
               <motion.div
+                key="blog-backdrop"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -108,6 +112,7 @@ export const BlogSection: React.FC = () => {
               ></motion.div>
 
               <motion.div
+                key="blog-modal-content"
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -164,7 +169,7 @@ export const BlogSection: React.FC = () => {
                 </div>
 
               </motion.div>
-            </div>
+            </motion.div>
           )}
         </AnimatePresence>
 

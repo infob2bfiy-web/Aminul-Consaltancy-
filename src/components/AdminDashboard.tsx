@@ -649,12 +649,18 @@ export const AdminDashboard: React.FC = () => {
 
 ALTER TABLE site_data ENABLE ROW LEVEL SECURITY;
 
--- Drop existing policies if they already exist to prevent duplicate policy errors
+-- Drop existing policies to prevent conflict errors
 DROP POLICY IF EXISTS "Allow public read access" ON site_data;
-CREATE POLICY "Allow public read access" ON site_data FOR SELECT USING (true);
-
 DROP POLICY IF EXISTS "Allow public update access" ON site_data;
-CREATE POLICY "Allow public update access" ON site_data FOR ALL USING (true) WITH CHECK (true);`);
+DROP POLICY IF EXISTS "Allow public select" ON site_data;
+DROP POLICY IF EXISTS "Allow public insert" ON site_data;
+DROP POLICY IF EXISTS "Allow public update" ON site_data;
+DROP POLICY IF EXISTS "Allow public delete" ON site_data;
+
+-- Create explicit, robust policies for SELECT, INSERT, and UPDATE
+CREATE POLICY "Allow public select" ON site_data FOR SELECT USING (true);
+CREATE POLICY "Allow public insert" ON site_data FOR INSERT WITH CHECK (true);
+CREATE POLICY "Allow public update" ON site_data FOR UPDATE USING (true) WITH CHECK (true);`);
                               setSqlCopied(true);
                               setTimeout(() => setSqlCopied(false), 3000);
                             }}

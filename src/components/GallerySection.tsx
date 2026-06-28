@@ -152,8 +152,12 @@ export const GallerySection: React.FC = () => {
         {/* Lightbox pop-up */}
         <AnimatePresence>
           {lightboxImg && (
-            <div className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4">
+            <motion.div
+              key="gallery-modal-container"
+              className="fixed inset-0 z-50 overflow-hidden flex items-center justify-center p-4"
+            >
               <motion.div
+                key="gallery-backdrop"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -162,6 +166,7 @@ export const GallerySection: React.FC = () => {
               ></motion.div>
 
               <motion.div
+                key="gallery-modal-content"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
@@ -201,7 +206,7 @@ export const GallerySection: React.FC = () => {
                 </div>
 
               </motion.div>
-            </div>
+            </motion.div>
           )}
         </AnimatePresence>
 

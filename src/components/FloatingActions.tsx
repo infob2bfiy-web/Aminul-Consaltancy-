@@ -32,6 +32,7 @@ export const FloatingActions: React.FC = () => {
         <AnimatePresence>
           {/* WhatsApp Direct */}
           <motion.a
+            key="wa-direct-desktop"
             href={getWhatsappUrl()}
             target="_blank"
             rel="noreferrer"
@@ -48,6 +49,7 @@ export const FloatingActions: React.FC = () => {
 
           {/* Call Directly */}
           <motion.a
+            key="call-direct-desktop"
             href={`tel:${data.settings.phone}`}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
@@ -61,6 +63,7 @@ export const FloatingActions: React.FC = () => {
           {/* Scroll To Top (Desktop) */}
           {isVisible && (
             <motion.button
+              key="scroll-top-desktop"
               onClick={handleScrollTop}
               initial={{ scale: 0, y: 10, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
@@ -101,6 +104,7 @@ export const FloatingActions: React.FC = () => {
         <AnimatePresence>
           {isVisible && (
             <motion.button
+              key="scroll-top-mobile"
               onClick={handleScrollTop}
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
