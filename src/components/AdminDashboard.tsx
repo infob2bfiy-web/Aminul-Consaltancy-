@@ -3,9 +3,10 @@ import { useApp } from "../context/AppContext";
 import { CompanySettings, ServiceItem, ProjectItem, TestimonialItem, BlogItem, FaqItem, TeamMember } from "../types";
 import {
   Lock, Mail, Settings, ShieldAlert, Key, Plus, Trash2, Edit, Save, ListFilter,
-  Eye, Download, Upload, CheckSquare, RefreshCw, LogOut, CheckCircle2, ChevronRight, UserPlus, FileText, Smartphone
+  Eye, Download, Upload, CheckSquare, RefreshCw, LogOut, CheckCircle2, ChevronRight, UserPlus, FileText, Smartphone, Phone, MessageSquare
 } from "lucide-react";
 import { motion } from "motion/react";
+import { ImageUploader } from "./ImageUploader";
 
 export const AdminDashboard: React.FC = () => {
   const {
@@ -33,6 +34,16 @@ export const AdminDashboard: React.FC = () => {
 
   // Active Tab State inside dashboard
   const [activeTab, setActiveTab] = useState<"general" | "services" | "projects" | "blogs" | "inbox" | "security">("general");
+
+  // Logo and Favicon states for custom image upload
+  const [logoUrl, setLogoUrl] = useState(data.settings.logoUrl || "");
+  const [faviconUrl, setFaviconUrl] = useState(data.settings.faviconUrl || "");
+
+  // Sync states when data is loaded/loaded from cloud
+  React.useEffect(() => {
+    if (data.settings.logoUrl !== undefined) setLogoUrl(data.settings.logoUrl);
+    if (data.settings.faviconUrl !== undefined) setFaviconUrl(data.settings.faviconUrl);
+  }, [data.settings.logoUrl, data.settings.faviconUrl]);
 
   // Filter messages state
   const [messageFilter, setMessageFilter] = useState<"all" | "unread" | "read">("all");
@@ -69,8 +80,8 @@ export const AdminDashboard: React.FC = () => {
     const updatedSettings: Partial<CompanySettings> = {
       name: formData.get("name") as string,
       tagline: formData.get("tagline") as string,
-      logoUrl: formData.get("logoUrl") as string,
-      faviconUrl: formData.get("faviconUrl") as string,
+      logoUrl: logoUrl,
+      faviconUrl: faviconUrl,
       phone: formData.get("phone") as string,
       whatsapp: formData.get("whatsapp") as string,
       email: formData.get("email") as string,
@@ -696,28 +707,24 @@ CREATE POLICY "Allow public update access" ON site_data FOR ALL USING (true) WIT
                   </div>
 
                   {/* Logo and Favicon */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-[#03140f] p-4 rounded-xl border border-white/5">
                     <div className="space-y-1">
-                      <label className="text-xs text-gray-300 font-bold uppercase font-sans">লোগো ইমেজের লিংক (Logo URL)</label>
-                      <input
-                        type="text"
-                        name="logoUrl"
+                      <ImageUploader
+                        label="লোগো ইমেজ (Company Logo)"
+                        value={logoUrl}
+                        onChange={setLogoUrl}
                         placeholder="https://example.com/logo.png"
-                        defaultValue={data.settings.logoUrl || ""}
-                        className="w-full bg-[#03140f] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#E6B325] font-sans"
+                        helperText="ফাঁকা রাখলে ডিফল্ট লোগো আইকন প্রদর্শিত হবে"
                       />
-                      <p className="text-[10px] text-gray-400 font-sans">ফাঁকা রাখলে ডিফল্ট লোগো আইকন প্রদর্শিত হবে</p>
                     </div>
                     <div className="space-y-1">
-                      <label className="text-xs text-gray-300 font-bold uppercase font-sans">ফেভিকন ইমেজের লিংক (Favicon URL)</label>
-                      <input
-                        type="text"
-                        name="faviconUrl"
+                      <ImageUploader
+                        label="ফেভিকন ইমেজ (Favicon Icon)"
+                        value={faviconUrl}
+                        onChange={setFaviconUrl}
                         placeholder="https://example.com/favicon.png"
-                        defaultValue={data.settings.faviconUrl || ""}
-                        className="w-full bg-[#03140f] border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#E6B325] font-sans"
+                        helperText="ব্রাউজার ট্যাবে প্রদর্শিত ছোট আইকন"
                       />
-                      <p className="text-[10px] text-gray-400 font-sans">ব্রাউজার ট্যাবে প্রদর্শিত ছোট আইকন</p>
                     </div>
                   </div>
 
@@ -986,13 +993,12 @@ CREATE POLICY "Allow public update access" ON site_data FOR ALL USING (true) WIT
                         </select>
                       </div>
                       <div className="sm:col-span-2 space-y-1">
-                        <label className="text-[10px] text-gray-300 font-bold uppercase font-sans">সার্ভিস থাম্বনেইল ইমেজ লিংক (Unsplash Image URL)</label>
-                        <input
-                          type="text"
+                        <ImageUploader
+                          label="সার্ভিস থাম্বনেইল ইমেজ (Service Thumbnail)"
                           value={addSrvForm.image}
-                          onChange={(e) => setAddSrvForm({ ...addSrvForm, image: e.target.value })}
+                          onChange={(val) => setAddSrvForm({ ...addSrvForm, image: val })}
                           placeholder="https://images.unsplash.com/photo-..."
-                          className="w-full bg-[#07241c] border border-white/10 rounded px-3 py-1.5 text-xs text-white font-mono"
+                          helperText="সার্ভিস কার্ডের জন্য কাস্টম ছবি আপলোড করুন অথবা লিংক বসান"
                         />
                       </div>
                     </div>
@@ -1246,36 +1252,32 @@ CREATE POLICY "Allow public update access" ON site_data FOR ALL USING (true) WIT
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-[#03140f] p-4 rounded-xl border border-white/5">
                       <div className="space-y-1">
-                        <label className="text-[10px] text-gray-300 font-bold uppercase font-sans">সম্পন্ন হওয়া মেইন ইমেজ (Image After)</label>
-                        <input
-                          type="text"
-                          required
+                        <ImageUploader
+                          label="সম্পন্ন হওয়া মেইন ইমেজ (Project Main Image)"
                           value={addProjForm.image}
-                          onChange={(e) => setAddProjForm({ ...addProjForm, image: e.target.value })}
+                          onChange={(val) => setAddProjForm({ ...addProjForm, image: val })}
                           placeholder="Unsplash completed URL"
-                          className="w-full bg-[#07241c] border border-white/10 rounded px-3 py-1.5 text-white font-mono text-xs focus:outline-none"
+                          helperText="প্রজেক্টের প্রধান কাভার ছবি"
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[10px] text-gray-300 font-bold uppercase font-sans">পূর্বের খালি জায়গা ইমেজ (Before - optional)</label>
-                        <input
-                          type="text"
-                          value={addProjForm.beforeImage}
-                          onChange={(e) => setAddProjForm({ ...addProjForm, beforeImage: e.target.value })}
+                        <ImageUploader
+                          label="পূর্বের খালি জায়গা ইমেজ (Before - optional)"
+                          value={addProjForm.beforeImage || ""}
+                          onChange={(val) => setAddProjForm({ ...addProjForm, beforeImage: val })}
                           placeholder="Unsplash raw land URL"
-                          className="w-full bg-[#07241c] border border-white/10 rounded px-3 py-1.5 text-white font-mono text-xs focus:outline-none"
+                          helperText="কাজ শুরু করার পূর্বের ছবি"
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="text-[10px] text-gray-300 font-bold uppercase font-sans">পরবর্তী বাড়ি ইমেজ (After - optional)</label>
-                        <input
-                          type="text"
-                          value={addProjForm.afterImage}
-                          onChange={(e) => setAddProjForm({ ...addProjForm, afterImage: e.target.value })}
+                        <ImageUploader
+                          label="পরবর্তী বাড়ি ইমেজ (After - optional)"
+                          value={addProjForm.afterImage || ""}
+                          onChange={(val) => setAddProjForm({ ...addProjForm, afterImage: val })}
                           placeholder="Same completed URL"
-                          className="w-full bg-[#07241c] border border-white/10 rounded px-3 py-1.5 text-white font-mono text-xs focus:outline-none"
+                          helperText="কাজ শেষ করার পরবর্তী ছবি"
                         />
                       </div>
                     </div>
@@ -1493,6 +1495,16 @@ CREATE POLICY "Allow public update access" ON site_data FOR ALL USING (true) WIT
                       <textarea rows={2} required value={addTestimonialForm.reviewEn} onChange={(e) => setAddTestimonialForm({ ...addTestimonialForm, reviewEn: e.target.value })} className="w-full bg-[#07241c] border border-white/10 rounded px-2.5 py-1 text-white font-sans text-xs focus:outline-none"></textarea>
                     </div>
 
+                    <div className="bg-[#03140f] p-4 rounded-xl border border-white/5 space-y-1">
+                      <ImageUploader
+                        label="ক্লায়েন্ট প্রোফাইল ছবি (Client Avatar)"
+                        value={addTestimonialForm.image}
+                        onChange={(val) => setAddTestimonialForm({ ...addTestimonialForm, image: val })}
+                        placeholder="https://images.unsplash.com/photo-..."
+                        helperText="ক্লায়েন্টের ছবি আপলোড করুন অথবা সোর্স লিংক বসান"
+                      />
+                    </div>
+
                     <button type="submit" className="bg-[#E6B325] hover:bg-[#CD9B13] text-black font-extrabold py-2 px-6 rounded-lg text-xs shadow transition cursor-pointer font-sans">
                       রিভিউ কার্ড প্রকাশ করুন
                     </button>
@@ -1571,6 +1583,16 @@ CREATE POLICY "Allow public update access" ON site_data FOR ALL USING (true) WIT
                         <label className="text-gray-400 font-sans">লেখকের নাম (বাংলা)</label>
                         <input type="text" value={addBlogForm.authorBn} onChange={(e) => setAddBlogForm({ ...addBlogForm, authorBn: e.target.value })} className="w-full bg-[#07241c] border border-[#07241c]/20 rounded px-2.5 py-1 text-white font-sans text-xs focus:outline-none" />
                       </div>
+                    </div>
+
+                    <div className="bg-[#03140f] p-4 rounded-xl border border-white/5 space-y-1">
+                      <ImageUploader
+                        label="ব্লগ কভার ইমেজ (Blog Cover Image)"
+                        value={addBlogForm.image}
+                        onChange={(val) => setAddBlogForm({ ...addBlogForm, image: val })}
+                        placeholder="https://images.unsplash.com/photo-..."
+                        helperText="ব্লগের জন্য কাস্টম কাভার ছবি আপলোড করুন অথবা ইন্টারনেট সোর্স লিংক বসান"
+                      />
                     </div>
 
                     <div className="space-y-1">

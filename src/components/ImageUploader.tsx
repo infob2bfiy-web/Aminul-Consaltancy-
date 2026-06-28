@@ -1,256 +1,250 @@
-import React, { useState, useRef } from 'react';
-import { Upload, Link, Trash2, Image as ImageIcon, Sparkles, AlertCircle } from 'lucide-react';
-import { useApp } from '../AppContext';
+import React, { useState, useRef } from "react";
+import { Upload, X, Image as ImageIcon, Link as LinkIcon, AlertCircle } from "lucide-react";
 
 interface ImageUploaderProps {
+  label: string;
   value: string;
   onChange: (value: string) => void;
-  label?: string;
   placeholder?: string;
+  helperText?: string;
 }
 
 export const ImageUploader: React.FC<ImageUploaderProps> = ({
+  label,
   value,
   onChange,
-  label = 'ছবি আপলোড করুন (Upload Image)',
-  placeholder = 'https://example.com/image.jpg'
+  placeholder = "https://example.com/image.jpg",
+  helperText,
 }) => {
-  const { lang } = useApp();
-  const [activeTab, setActiveTab] = useState<'upload' | 'url'>(value.startsWith('data:') ? 'upload' : 'url');
-  const [isCompressing, setIsCompressing] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showUrlInput, setShowUrlInput] = useState(!value || !value.startsWith("data:image"));
+  const [urlValue, setUrlValue] = useState(value && !value.startsWith("data:image") ? value : "");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const compressAndSetImage = (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      setErrorMsg(lang === 'bn' ? 'দয়া করে একটি ইমেজ ফাইল নির্বাচন করুন।' : 'Please select a valid image file.');
+  // Compress and convert to Base64
+  const processFile = (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      setError("দয়া করে শুধুমাত্র ছবি ফাইল আপলোড করুন।");
       return;
     }
 
-    setIsCompressing(true);
-    setErrorMsg(null);
+    // Limit size check: warn if too large, but auto-compress
+    setError(null);
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = (event) => {
       const img = new Image();
       img.onload = () => {
-        try {
-          // Compress the image using HTML5 Canvas
-          const canvas = document.createElement('canvas');
-          let width = img.width;
-          let height = img.height;
+        // Create canvas to downscale/compress
+        const canvas = document.createElement("canvas");
+        const MAX_WIDTH = 800; // Limit to 800px width for client-side compression
+        const MAX_HEIGHT = 800;
+        let width = img.width;
+        let height = img.height;
 
-          // Set maximum dimension
-          const MAX_DIM = 1000;
+        if (width > MAX_WIDTH || height > MAX_HEIGHT) {
           if (width > height) {
-            if (width > MAX_DIM) {
-              height = Math.round((height * MAX_DIM) / width);
-              width = MAX_DIM;
-            }
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
           } else {
-            if (height > MAX_DIM) {
-              width = Math.round((width * MAX_DIM) / height);
-              height = MAX_DIM;
-            }
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
           }
+        }
 
-          canvas.width = width;
-          canvas.height = height;
+        canvas.width = width;
+        canvas.height = height;
 
-          const ctx = canvas.getContext('2d');
-          if (!ctx) {
-            throw new Error('Canvas context is null');
-          }
-
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
           ctx.drawImage(img, 0, 0, width, height);
-
-          // Export as JPEG with 0.7 quality to significantly reduce file size
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-          
-          // Verify file size in base64 (~1.33 times original byte size)
-          const approximateSizeKB = Math.round((compressedBase64.length * 3) / 4 / 1024);
-          if (approximateSizeKB > 800) {
-            // If still too large, compress further
-            const extraCompressed = canvas.toDataURL('image/jpeg', 0.5);
-            onChange(extraCompressed);
-          } else {
-            onChange(compressedBase64);
-          }
-          setIsCompressing(false);
-        } catch (err) {
-          console.error(err);
-          setErrorMsg(lang === 'bn' ? 'ছবি প্রসেস করতে সমস্যা হয়েছে।' : 'Error processing image.');
-          setIsCompressing(false);
+          // Convert to JPEG with 0.75 quality for beautiful look + lightweight storage
+          const compressedBase64 = canvas.toDataURL("image/jpeg", 0.75);
+          onChange(compressedBase64);
+          setShowUrlInput(false);
+        } else {
+          onChange(event.target?.result as string);
+          setShowUrlInput(false);
         }
       };
-      img.onerror = () => {
-        setErrorMsg(lang === 'bn' ? 'ছবি লোড করতে সমস্যা হয়েছে।' : 'Error loading image.');
-        setIsCompressing(false);
-      };
-      img.src = e.target?.result as string;
+      img.src = event.target?.result as string;
     };
     reader.readAsDataURL(file);
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      compressAndSetImage(file);
-    }
-  };
-
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      compressAndSetImage(file);
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      processFile(e.dataTransfer.files[0]);
     }
   };
 
-  const handleClear = () => {
-    onChange('');
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      processFile(e.target.files[0]);
     }
-    setErrorMsg(null);
   };
 
-  const isBase64 = value.startsWith('data:');
+  const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setUrlValue(val);
+    onChange(val);
+  };
+
+  const handleRemove = () => {
+    onChange("");
+    setUrlValue("");
+    setError(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const triggerFileSelect = () => {
+    fileInputRef.current?.click();
+  };
+
+  const isBase64 = value && value.startsWith("data:image");
 
   return (
-    <div className="space-y-2 block text-left">
-      <div className="flex items-center justify-between">
-        <label className="text-xs text-gray-300 font-bold block">{label}</label>
-        <div className="flex bg-[#041410] border border-[#0d5c46]/40 rounded-lg p-0.5 text-[10px] font-sans">
+    <div className="space-y-1.5 w-full">
+      <div className="flex justify-between items-center">
+        <label className="text-xs text-gray-300 font-bold uppercase font-sans flex items-center gap-1">
+          {label}
+        </label>
+        <div className="flex gap-2">
           <button
             type="button"
-            onClick={() => {
-              setActiveTab('upload');
-              setErrorMsg(null);
-            }}
-            className={`px-2 py-0.5 rounded cursor-pointer transition-colors ${
-              activeTab === 'upload' 
-                ? 'bg-[#0d5c46] text-[#e6b325] font-bold' 
-                : 'text-gray-400 hover:text-white'
+            onClick={() => setShowUrlInput(!showUrlInput)}
+            className={`text-[10px] px-2 py-0.5 rounded border transition cursor-pointer font-sans ${
+              showUrlInput 
+                ? "bg-[#E6B325]/20 border-[#E6B325] text-[#E6B325]" 
+                : "bg-white/5 border-white/10 text-gray-400 hover:text-white"
             }`}
           >
-            {lang === 'bn' ? 'ডিভাইস থেকে' : 'From Device'}
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab('url');
-              setErrorMsg(null);
-            }}
-            className={`px-2 py-0.5 rounded cursor-pointer transition-colors ${
-              activeTab === 'url' 
-                ? 'bg-[#0d5c46] text-[#e6b325] font-bold' 
-                : 'text-gray-400 hover:text-white'
-            }`}
-          >
-            {lang === 'bn' ? 'লিংক (URL)' : 'URL Link'}
+            {showUrlInput ? "ফাইল আপলোডার চালু করুন" : "ইন্টারনেট লিংক (URL) বসান"}
           </button>
         </div>
       </div>
 
-      {activeTab === 'upload' ? (
-        <div className="space-y-2">
-          {value ? (
-            <div className="relative group border border-[#0d5c46]/40 rounded-xl overflow-hidden bg-[#041410] flex items-center justify-between p-3">
-              <div className="flex items-center space-x-3">
-                <img 
-                  src={value} 
-                  alt="Preview" 
-                  className="w-12 h-12 rounded-lg object-cover bg-white/5 border border-[#e6b325]/20"
-                  referrerPolicy="no-referrer"
-                />
-                <div>
-                  <span className="text-[10px] bg-[#e6b325]/10 text-[#e6b325] border border-[#e6b325]/20 rounded-full px-2 py-0.5 font-mono">
-                    {isBase64 ? 'Direct Uploaded' : 'Linked Image'}
-                  </span>
-                  <p className="text-[11px] text-gray-400 mt-1">
-                    {lang === 'bn' ? 'ছবিটি সফলভাবে লোড হয়েছে' : 'Image loaded successfully'}
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleClear}
-                className="p-1.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors cursor-pointer border border-red-500/20"
-                title={lang === 'bn' ? 'ছবি মুছুন' : 'Remove Image'}
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          ) : (
-            <div
-              onDragOver={handleDragOver}
-              onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all ${
-                isCompressing 
-                  ? 'border-[#e6b325]/40 bg-[#e6b325]/5 animate-pulse' 
-                  : 'border-[#0d5c46]/50 bg-[#041410] hover:border-[#e6b325] hover:bg-[#041d17]/30'
-              }`}
-            >
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept="image/*"
-                className="hidden"
-              />
-              <div className="space-y-2 flex flex-col items-center">
-                <div className="p-2.5 rounded-full bg-[#0d5c46]/30 text-[#e6b325] border border-[#e6b325]/20">
-                  <Upload className="w-5 h-5 animate-bounce" />
-                </div>
-                <div>
-                  <p className="text-xs text-white font-bold">
-                    {isCompressing 
-                      ? (lang === 'bn' ? 'ছবি সাইজ ছোট করা হচ্ছে...' : 'Compressing image...')
-                      : (lang === 'bn' ? 'ছবি সিলেক্ট করতে ক্লিক করুন অথবা ড্র্যাগ করুন' : 'Click or drag image to select')}
-                  </p>
-                  <p className="text-[10px] text-gray-400 mt-0.5">
-                    {lang === 'bn' ? 'যেকোনো ছবি (JPG, PNG) সাপোর্ট করে' : 'Supports any image (JPG, PNG)'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="flex items-center space-x-2">
-          <div className="relative flex-grow">
-            <input
-              type="text"
-              value={value}
-              onChange={(e) => onChange(e.target.value)}
-              placeholder={placeholder}
-              className="w-full bg-[#041410] border border-[#0d5c46]/50 rounded-xl pl-8 pr-3 py-2 text-xs text-white font-mono placeholder-gray-600 focus:outline-none focus:border-[#e6b325]"
-            />
-            <Link className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-gray-500" />
+      {showUrlInput ? (
+        <div className="relative">
+          <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none text-gray-400">
+            <LinkIcon className="w-4 h-4" />
           </div>
+          <input
+            type="url"
+            value={urlValue}
+            onChange={handleUrlChange}
+            placeholder={placeholder}
+            className="w-full bg-[#03140f] border border-white/10 rounded-lg pl-10 pr-10 py-2.5 text-sm text-white focus:outline-none focus:border-[#E6B325] font-sans"
+          />
           {value && (
             <button
               type="button"
-              onClick={handleClear}
-              className="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-colors cursor-pointer border border-red-500/20 shrink-0"
+              onClick={handleRemove}
+              className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-red-400 transition cursor-pointer"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              <X className="w-4 h-4" />
             </button>
+          )}
+        </div>
+      ) : (
+        <div
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={value ? undefined : triggerFileSelect}
+          className={`relative border-2 border-dashed rounded-xl p-4 transition text-center flex flex-col items-center justify-center min-h-[110px] cursor-pointer ${
+            isDragging
+              ? "border-[#E6B325] bg-[#E6B325]/10"
+              : value
+              ? "border-white/10 bg-[#03140f]/40 cursor-default"
+              : "border-white/10 bg-[#03140f] hover:border-[#E6B325]/40 hover:bg-[#03140f]/60"
+          }`}
+        >
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept="image/*"
+            className="hidden"
+          />
+
+          {value ? (
+            <div className="flex items-center gap-4 w-full">
+              <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-white/15 bg-black/40 flex items-center justify-center shrink-0">
+                <img
+                  src={value}
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    // Fallback to placeholder icon on broken preview
+                    (e.target as any).src = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=60";
+                  }}
+                />
+              </div>
+              <div className="text-left flex-1 min-w-0">
+                <p className="text-xs font-semibold text-white truncate font-sans">
+                  {isBase64 ? "কাস্টম ফাইল আপলোড করা হয়েছে" : "ইন্টারনেট ইমেজ সোর্স সচল"}
+                </p>
+                <p className="text-[10px] text-gray-400 font-sans mt-0.5">
+                  {isBase64 ? "Base64 Compressed JPG" : value}
+                </p>
+                <div className="flex gap-2 mt-2">
+                  <button
+                    type="button"
+                    onClick={triggerFileSelect}
+                    className="text-[10px] font-bold text-[#E6B325] hover:underline cursor-pointer font-sans"
+                  >
+                    অন্য ছবি দিন
+                  </button>
+                  <span className="text-gray-600 text-[10px]">•</span>
+                  <button
+                    type="button"
+                    onClick={handleRemove}
+                    className="text-[10px] font-bold text-red-400 hover:underline cursor-pointer font-sans"
+                  >
+                    ডিলিট করুন
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center mb-2 text-[#E6B325]">
+                <Upload className="w-5 h-5" />
+              </div>
+              <p className="text-xs text-gray-300 font-sans">
+                ক্লিক করে কম্পিউটার থেকে ফাইল বেছে নিন অথবা এখানে ড্র্যাগ এন্ড ড্রপ করুন
+              </p>
+              <p className="text-[10px] text-gray-400 font-sans mt-1">
+                PNG, JPG, JPEG, WEBP (Auto-compression enabled)
+              </p>
+            </>
           )}
         </div>
       )}
 
-      {errorMsg && (
-        <div className="flex items-center space-x-1.5 text-red-400 text-[11px] font-sans">
-          <AlertCircle className="w-3.5 h-3.5 shrink-0" />
-          <span>{errorMsg}</span>
+      {error && (
+        <div className="flex items-center gap-1.5 text-xs text-red-400 font-sans mt-1">
+          <AlertCircle className="w-3.5 h-3.5" />
+          <span>{error}</span>
         </div>
+      )}
+
+      {helperText && !error && (
+        <p className="text-[10px] text-gray-400 font-sans mt-0.5">{helperText}</p>
       )}
     </div>
   );

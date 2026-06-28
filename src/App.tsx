@@ -118,7 +118,7 @@ function AppContent() {
         </div>
       ) : (
         /* 2. PUBLIC MULTI-SECTION HOMEPAGE VIEW */
-        <div className="animate-fadeIn">
+        <div className="animate-fadeIn pb-20 md:pb-0">
           <Header onNavigate={handleNavigate} currentActiveSection={activeSection} />
           <HeroSection onNavigate={handleNavigate} />
           <AboutSection />
